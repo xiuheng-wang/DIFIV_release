@@ -12,3 +12,10 @@ For any questions, feel free to email us at xiuheng.wang@oca.eu or raborsoi@gmai
 
 If this code is helpful for you, please cite our paper as follows:
 
+	@article{wang2022deep,
+	  title={Deep Hyperspectral and Multispectral Image Fusion with Inter-image Variability},
+	  author={Wang, Xiuheng and Borsoi, Ricardo Augusto and Richard, C{\'e}dric and Chen, Jie},
+	  journal={arXiv preprint arXiv:2208.11376},
+	  year={2022}
+	}
+
