@@ -39,11 +39,3 @@ class Net(nn.Module):
     def forward(self, x):
         x = torch.sub(x, self.sequential(x)) # residual learning
         return x
-
-
-
-# source_img = torch.zeros([1,16,16,16])
-# device = 'cpu'
-# model = Net(nLayers=16, nChannels=source_img.shape[-1], multiply=4).to(device)
-# out = model(source_img)
-# print(out.shape)

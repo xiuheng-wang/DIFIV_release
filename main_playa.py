@@ -48,9 +48,6 @@ SNR_m = 35
 scale_factor = 4
 kernel_sigma = 4
 
-# parameters settings
-# p0.7, lambw=1e-4, 
-
 p = 1.5
 rho = 1e-1
 lambda_w = 1e-2
@@ -79,7 +76,6 @@ if __name__ == '__main__':
     hrmsi[hrmsi<1e-5] = 1e-5
 
     kernel = gaussian_kernel_2d(2*scale_factor, kernel_sigma)
-    # kernel = np.ones((scale_factor,scale_factor))/(scale_factor**2)
 
     srf = scio.loadmat(raw_image_dir)['SRF']
     dim = np.shape(label) # [band number, height, weight]
@@ -95,7 +91,6 @@ if __name__ == '__main__':
     # Generate the low-resolution hyperspectral image
     F = psf2otf(kernel, size)
     lrhsi = ZFD(label, F, scale_factor, size)
-    # lrhsi = ZFD(label, kernel, scale_factor, size)
 
     # Add noise
     hrmsi = add_gaussian_noise(hrmsi, SNR_m)
@@ -136,7 +131,6 @@ if __name__ == '__main__':
     # Calculate some constant variables
     FT = F.conjugate()
     FDTY_h = FDTY(Y_h, FT, scale_factor, size)
-    # FDTY_h = FDTY(Y_h, kernel, scale_factor, size)
 
     R = srf
     RT = srf.transpose()
@@ -149,7 +143,6 @@ if __name__ == '__main__':
         # Calculate Z_h
         B = FDTY_h + lambda_w * laplace(W2 * laplace(Z_m)) + rho * V_h 
         Az = lambda z: A_z_h_FFT(z, lambda_w, W2, rho, F, FT, scale_factor, dim)
-        # Az = lambda z: A_z_h_CONV(z, lambda_w, W2, rho, kernel, scale_factor, dim)
         b = B.flatten()
         A = LinearOperator((band* size[0]* size[1], band* size[0]* size[1]), matvec=Az)
         temp, cgit = cg(A, b, x0=Z_h.flatten(), tol=1e-03, maxiter=350)
@@ -182,7 +175,6 @@ if __name__ == '__main__':
             print('fine-tune deep denoiser engine for V_h:')
             D_h = Denoiser(V_h, dim, k_subspace, Epoch_f, 'fine-tune', model_path_h)
         V_h = (1 / (rho + lambda_h)) * (rho * Z_h + lambda_h * D_h)
-        # V_h = (1 / (rho + lambda_m)) * (rho * Z_h + lambda_h * denoise_wavelet(np.transpose(V_h, [1,2,0]), multichannel=True).transpose([2, 0, 1]))
 
         # Compute V_m
         if Iter == 0:
@@ -192,7 +184,6 @@ if __name__ == '__main__':
             print('fine-tune deep denoiser engine for V_m:')
             D_m = Denoiser(V_m, dim, k_subspace, Epoch_f, 'fine-tune', model_path_m)
         V_m = (1 / (rho + lambda_m)) * (rho * Z_m + lambda_m * D_m)
-        # V_m = (1 / (rho + lambda_m)) * (rho * Z_m + lambda_m * denoise_wavelet(np.transpose(V_m, [1,2,0]), multichannel=True).transpose([2, 0, 1]))
 
         print("Denoised: PSNR_h:" + str(np.around(psnr(label, V_h), 4)) + "    PSNR_m:" + str(np.around(psnr(label, V_m), 4)))
         print("Denoised: MSE_h:" + str(np.around(rmse(label, V_h), 4)) + "      MSE_m:" + str(np.around(rmse(label, V_m), 4)))

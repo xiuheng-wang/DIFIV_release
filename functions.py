@@ -8,13 +8,7 @@ import tifffile as tiff
 from scipy.ndimage import laplace
 from scipy.ndimage import convolve
 from scipy.ndimage import convolve1d
-# from scipy.fftpack import fft2, ifft2
 
-
-# def SS_grad(img):
-#     img_grad = np.abs(np.gradient(img))
-#     img_grad = np.sqrt(np.sum(np.square(img_grad), axis = 0))
-#     return img_grad
 
 def normalizeQuantile(Z, qval):
     bands = Z.shape[0]
@@ -43,16 +37,6 @@ def ZFD(Z, F, scale_factor, size):
     Y = Y[:, int(s0):size[0]:scale_factor, int(s0):size[1]:scale_factor]
     return Y
 
-# def ZFD(Z, kernel, scale_factor, size):
-#     s0 = np.floor(scale_factor / 2)
-#     dim = np.shape(Z)
-#     Y = np.zeros(dim)
-#     # Y = np.real(np.fft.ifftn(np.fft.fftn(Z) * F))
-#     for i in range(dim[0]):
-#         Y[i, :, :] = convolve(Z[i, :, :], kernel)
-#     Y = Y[:, int(s0):size[0]:scale_factor, int(s0):size[1]:scale_factor]
-#     return Y
-
 def FDTY(Y, FT, scale_factor, size):
     s0 = np.floor(scale_factor / 2)
     dim = np.shape(Y)
@@ -64,31 +48,6 @@ def FDTY(Y, FT, scale_factor, size):
     for i in range(dim[0]):
         X[i, :, :] = np.real(np.fft.ifft2(np.fft.fft2(X[i, :, :]) * FT))
     return X
-
-# def FDTY(Y, kernel_flip, scale_factor, size):
-#     s0 = np.floor(scale_factor / 2)
-#     dim = np.shape(Y)
-#     X = np.zeros([dim[0], size[0], size[1]])
-#     # X[:, int(s0):size[0]:scale_factor, int(s0):size[1]:scale_factor] = Y
-#     for i in range(dim[0]):
-#         X[i, :, :] = cv2.resize(Y[i, :, :], (size[1], size[0]), interpolation = cv2.INTER_NEAREST)
-#     for i in range(dim[0]):
-#         X[i, :, :] = convolve(X[i, :, :], kernel_flip)
-#     return X
-
-# def A_z_h(z, lambda_w, W2, rho, F, FT, scale_factor, size):
-#     s0 = np.floor(scale_factor / 2)
-#     # s0 = 0
-#     Z = np.reshape(z, size)
-#     ZF = np.real(np.fft.ifft2(np.fft.fft2(Z) * F))
-#     ZFD = ZF[int(s0):size[0]:scale_factor, int(s0):size[1]:scale_factor]
-#     # ZFDDT = cv2.resize(ZFD, (size[1], size[0]), interpolation = cv2.INTER_NEAREST)
-#     ZFDDT = np.zeros(size)
-#     ZFDDT[int(s0):size[0]:scale_factor, int(s0):size[1]:scale_factor] = ZFD
-#     ZFDDTFT = np.real(np.fft.ifft2(np.fft.fft2(ZFDDT) * FT))
-#     Az = ZFDDTFT.flatten().transpose() + lambda_w * laplace(W2 * laplace(Z)).flatten().transpose() + rho * z
-#     return Az
-
 
 def A_z_h_FFT(z, lambda_w, W2, rho, F, FT, scale_factor, size):
      s0 = np.floor(scale_factor / 2)
@@ -138,13 +97,6 @@ def add_gaussian_noise(img, snr = 10):
     noise = np.random.randn(np.shape(img)[0], np.shape(img)[1], np.shape(img)[2]) * np.sqrt(npower)
     img = img + noise
     return img
-
-# def sd2SNR(img, sigma):
-#     xpower = np.sum(img**2)/img.size
-#     npower = sigma ** 2
-#     snr = xpower / npower
-#     snr = 10.0 * np.log10(snr)
-#     return snr
 
 def makedir(new_dir):
     if not os.path.exists(new_dir):

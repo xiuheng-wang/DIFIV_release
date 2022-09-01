@@ -76,13 +76,9 @@ def Denoiser(V, dim, k_subspace, num_steps, mode = 'pre-train', model_path = './
             loss = torch.mean(torch.abs(output - image))
             loss.backward()
             optimizer.step()
-            # noise.data = noise_saved + 1./30 * sigma_est * torch.randn(noise.shape).to(device)
-            # if (step + 1) % 200 == 0:
-            #     image.data = output.data
             if (step == 0) or ((step + 1) % 1000 == 0):
                 print('At step {}, loss is {}'.format(step + 1, loss.data.cpu()))
         # save model
-        # if mode == 'pre-train':
         torch.save({
             'model_state_dict': net.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
@@ -103,9 +99,6 @@ def Denoiser(V, dim, k_subspace, num_steps, mode = 'pre-train', model_path = './
     # reconstruct data using denoising engin images
     output = np.clip(output, 0, 1)
     output = np.reshape(output, [k_subspace, dim[1]*dim[2]])
-    # cv2.imshow("Resized image", np.reshape(output[0,:], [dim[1], dim[2]]))
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
     output = output * scale + Min
     output = np.dot(u, output)
     output = np.reshape(output, dim)

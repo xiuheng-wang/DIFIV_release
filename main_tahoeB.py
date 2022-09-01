@@ -48,9 +48,6 @@ SNR_m = 35
 scale_factor = 4
 kernel_sigma = 4
 
-# parameters settings
-# p0.7, lambw=1e-4, 
-
 p = 1.8
 rho = 1e-1
 lambda_w = 2e-3
@@ -123,9 +120,6 @@ if __name__ == '__main__':
     print(np.min(abs(W)), np.max(abs(W)))
     W2 = W ** 2
     
-    # W = np.ones(W.shape)
-    # W2 = np.ones(W2.shape)
-    
     # HQS
     # Initialize variables
     Y_h = copy.deepcopy(lrhsi)
@@ -182,13 +176,11 @@ if __name__ == '__main__':
         # Compute V_h
         if Iter == 0:
             print('pre-train deep denoiser engine for V_h:')
-            # _ = Denoiser(Y_h, np.shape(Y_h), k_subspace, 5000, 'pre-train', model_path_h)
             D_h = Denoiser(V_h, dim, k_subspace, Epoch_p, 'pre-train', model_path_h)
         else:
             print('fine-tune deep denoiser engine for V_h:')
             D_h = Denoiser(V_h, dim, k_subspace, Epoch_f, 'fine-tune', model_path_h)
         V_h = (1 / (rho + lambda_h)) * (rho * Z_h + lambda_h * D_h)
-        # V_h = (1 / (rho + lambda_m)) * (rho * Z_h + lambda_h * denoise_wavelet(np.transpose(V_h, [1,2,0]), multichannel=True).transpose([2, 0, 1]))
 
         # Compute V_m
         if Iter == 0:
@@ -198,7 +190,6 @@ if __name__ == '__main__':
             print('fine-tune deep denoiser engine for V_m:')
             D_m = Denoiser(V_m, dim, k_subspace, Epoch_f, 'fine-tune', model_path_m)
         V_m = (1 / (rho + lambda_m)) * (rho * Z_m + lambda_m * D_m)
-        # V_m = (1 / (rho + lambda_m)) * (rho * Z_m + lambda_m * denoise_wavelet(np.transpose(V_m, [1,2,0]), multichannel=True).transpose([2, 0, 1]))
         print("Denoised: PSNR_h:" + str(np.around(psnr(label, V_h), 4)) + "    PSNR_m:" + str(np.around(psnr(label, V_m), 4)))
         print("Denoised: MSE_h:" + str(np.around(rmse(label, V_h), 4)) + "      MSE_m:" + str(np.around(rmse(label, V_m), 4)))
 
