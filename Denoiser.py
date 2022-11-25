@@ -31,7 +31,7 @@ def weights_init_kaiming(m):
 def Denoiser(V, dim, k_subspace, num_steps, mode = 'pre-train', model_path = './models/model.pkl'):
     # dimensionality reduction
     v = np.reshape(V, [dim[0], dim[1] * dim[2]])
-    u, _, _ = np.linalg.svd(v)
+    u, _, _ = np.linalg.svd(v, full_matrices=False)
     u = u[:, 0:k_subspace]
     eigen_v = np.dot(u.transpose(), v)
     # normalization
